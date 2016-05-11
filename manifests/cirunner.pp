@@ -56,26 +56,6 @@ class gitlab::cirunner (
 
   if $manage_repo {
     case $::osfamily {
-      'Debian': {
-        $distid = downcase($::lsbdistid)
-
-        ::apt::source { 'apt_gitlabci':
-          comment  => 'GitlabCI Runner Repo',
-          location => "https://packages.gitlab.com/runner/gitlab-ci-multi-runner/${distid}/",
-          release  => $::lsbdistcodename,
-          repos    => 'main',
-          key      => {
-            'id'     => '1A4C919DB987D435939638B914219A96E15E78F4',
-            'server' => 'keys.gnupg.net',
-          },
-          include  => {
-            'src' => false,
-            'deb' => true,
-          }
-        }
-        Apt::Source['apt_gitlabci'] -> Package['gitlab-ci-multi-runner']
-        Exec['apt_update'] -> Package['gitlab-ci-multi-runner']
-      }
       'RedHat': {
         yumrepo { 'runner_gitlab-ci-multi-runner':
           ensure        => 'present',

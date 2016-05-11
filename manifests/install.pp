@@ -14,41 +14,6 @@ class gitlab::install {
   # only do repo management when on a Debian-like system
   if $manage_package_repo {
     case $::osfamily {
-      'debian': {
-        include apt
-        ensure_packages('apt-transport-https')
-        $_lower_os = downcase($::operatingsystem)
-        apt::source { 'gitlab_official':
-          comment  => 'Official repository for Gitlab',
-          location => "https://packages.gitlab.com/gitlab/gitlab-${edition}/${_lower_os}/",
-          release  => $::lsbdistcodename,
-          repos    => 'main',
-          key      => {
-            id     => '1A4C919DB987D435939638B914219A96E15E78F4',
-            source => 'https://packages.gitlab.com/gpg.key',
-          },
-          include  => {
-            src => true,
-            deb => true,
-          },
-        }
-        if $manage_package {
-          package { $package_name:
-            ensure  => $package_ensure,
-            require => [
-              Exec['apt_update'],
-              Apt::Source['gitlab_official'],
-            ],
-          }
-        }
-        if $package_pin {
-          apt::pin { 'hold-gitlab':
-            packages => $package_name,
-            version  => $package_ensure,
-            priority => 1001,
-          }
-        }
-      }
       'redhat': {
         if is_hash($::os) {
           $releasever = $::os[release][major]
